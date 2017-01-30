@@ -50,7 +50,146 @@
         </div>
         <pre class="debug"></pre>
         <script>
-            // your code goes here ...
+            function householdBuilder() {
+                
+                this.members = [];
+                
+                /**
+                 *
+                 * Create the display table and
+                 * set the click handlers for the form buttons
+                 *
+                 */
+                this.init = function() {
+                    var me = this,
+                        builder = document.getElementsByClassName('builder')[0],
+                        addButton = document.getElementsByClassName('add')[0];
+                        //submit = document.getElementsByTag('submit')[0];
+
+                    me.table = document.createElement('table');
+                    me.table.innerHTML = '<table><tr>'+
+                        '<th>Age</th>'+
+                        '<th>Rel</th>'+
+                        '<th>Smoker</th>'+
+                        '<th>Delete</th>'+
+                        '</tr></table>';
+                    
+                    builder.appendChild(me.table);
+                    
+                    addButton.setAttribute('type', 'button');
+                    addButton.onclick = function(){
+                        console.log('add member was clicked');
+                        me.addMember(me.getFormData());    
+                    }
+                    
+                    //submitButton.setAttribute('type','button');
+                    //submitButton.onclick = function(){
+                    //    me.persist();
+                    //}
+                }
+                
+                this.getForm = function(){
+                    return document.forms[0];
+                }
+                
+                this.getFormData = function() {
+                    var form = this.getForm();
+                    return {
+                        'age' : form.age.value,
+                        'rel' : form.rel.value,
+                        'smoker' : form.smoker.checked
+                    }
+                }             
+                
+                /**
+                 * Add people to a growing household list
+                 *
+                 */
+                this.addMember = function(member) {
+                    var me = this,
+                        row,
+                        cell;
+                    
+                    if(me.validateMember(member)){
+                        row = me.table.insertRow();
+                        for (var i in member) {
+                            cell = row.insertCell();
+                            cell.innerHTML = member[i];
+                        }
+                        
+                        cell = row.insertCell();
+                        cell.innerHTML = '[ X ]'
+                        cell.onclick = function(){
+                            var cell = this;
+                            me.removeMember(cell.parentElement.rowIndex);
+                        };
+                        me.members.push(member);
+                    }else{
+                        alert('required fields are missing or invalid')
+                    }
+                }
+                
+                /**
+                 *
+                 * Remove a previously added person from the list
+                 *
+                 */
+                this.removeMember = function(index_position) {
+                    this.table.deleteRow(index_position);
+                    this.members.splice(index_position-1, 1);
+                }
+                
+                /**
+                 *
+                 * Validate data entry (age is required and > 0, relationship is required)
+                 *
+                 */
+                this.validateMember = function (member) {
+                    var memberDef = {
+                            minAge : 1,
+                            rel : [
+                                "self",
+                                "spouse",
+                                "child",
+                                "parent",
+                                "grandparent",
+                                "other"
+                            ],
+                            smoker : false
+                        }
+                        
+                    try{
+                        if (isNaN(Number(member.age)) || member.age < memberDef.minAge) {
+                            return false;
+                        }else if (memberDef.rel.indexOf(member.rel) < 0) {
+                            return false;
+                        }else if (typeof member.smoker != "boolean") {
+                            return false;
+                        }
+                        
+                        return true;
+                    }catch(e){
+                        return false;
+                    }
+                }
+                
+                /**
+                 *
+                 * Where we'd normally do our ajax call to the server.
+                 * Stashing in localStorage instead
+                 *
+                 */
+                this.persist = function() {
+                    var me = this,
+                        pre = document.getElementsByClassName('debug')[0];
+                    
+                    pre.innerHTML = JSON.stringify(me.members);
+                }
+                
+            }
+            
+            hhb = new householdBuilder();
+            hhb.init();
         </script>
     </body>
 </html>
