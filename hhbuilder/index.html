@@ -64,7 +64,6 @@
                     var me = this,
                         builder = document.getElementsByClassName('builder')[0],
                         addButton = document.getElementsByClassName('add')[0];
-                        //submit = document.getElementsByTag('submit')[0];
 
                     me.table = document.createElement('table');
                     me.table.innerHTML = '<table><tr>'+
@@ -82,10 +81,10 @@
                         me.addMember(me.getFormData());    
                     }
                     
-                    //submitButton.setAttribute('type','button');
-                    //submitButton.onclick = function(){
-                    //    me.persist();
-                    //}
+                    me.getForm().onsubmit = function(){
+                        me.persist();
+                        return false;
+                    }
                 }
                 
                 this.getForm = function(){
@@ -176,7 +175,6 @@
                 /**
                  *
                  * Where we'd normally do our ajax call to the server.
-                 * Stashing in localStorage instead
                  *
                  */
                 this.persist = function() {
@@ -184,6 +182,7 @@
                         pre = document.getElementsByClassName('debug')[0];
                     
                     pre.innerHTML = JSON.stringify(me.members);
+                    pre.style.display = 'block';
                 }
                 
             }
