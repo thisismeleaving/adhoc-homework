@@ -1,25 +1,65 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httptest"
+	"sort"
 	"strconv"
-	"crypto/sha1"
+	"strings"
 )
 
-const ( 
+const (
 	crlf       = "\r\n"
 	colonspace = ": "
 )
 
 func ChecksumMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// your code goes here ...
+
+		handler := func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+
+		rw := httptest.NewRecorder()
+		handler(rw, r)
+
 		hasher := sha1.New()
-		
-		hasher.Write("test")
+		header := rw.Header()
+		checksum_headers_str := ""
+		var keys []string
+
+		for k := range header {
+			keys = append(keys, k)
+		}
+
+		sort.Strings(keys)
+
+		s := strconv.Itoa(rw.Code) + crlf
+
+		for _, k := range keys {
+			s += k + colonspace + header.Get(k) + crlf
+		}
+
+		checksum_headers_str += strings.Join(keys, ";")
+
+		s += "X-Checksum-Headers: " + checksum_headers_str
+		s += crlf + crlf + rw.Body.String()
+
+		fmt.Println(s)
+
+		hasher.Write([]byte(s))
+		sha1_hash := hex.EncodeToString(hasher.Sum(nil))
+
+		w.Header().Add("X-Checksum", sha1_hash)
+		w.Header().Add("X-Checksum-Headers", checksum_headers_str)
+
+		h.ServeHTTP(w, r)
+
 	})
 }
 
