@@ -28,18 +28,17 @@ func ChecksumMiddleware(h http.Handler) http.Handler {
 		rw := httptest.NewRecorder()
 		handler(rw, r)
 
+		var keys []string
 		hasher := sha1.New()
 		header := rw.Header()
 		checksum_headers_str := ""
-		var keys []string
+		s := strconv.Itoa(rw.Code) + crlf
 
 		for k := range header {
 			keys = append(keys, k)
 		}
 
 		sort.Strings(keys)
-
-		s := strconv.Itoa(rw.Code) + crlf
 
 		for _, k := range keys {
 			s += k + colonspace + header.Get(k) + crlf
@@ -49,8 +48,6 @@ func ChecksumMiddleware(h http.Handler) http.Handler {
 
 		s += "X-Checksum-Headers: " + checksum_headers_str
 		s += crlf + crlf + rw.Body.String()
-
-		fmt.Println(s)
 
 		hasher.Write([]byte(s))
 		sha1_hash := hex.EncodeToString(hasher.Sum(nil))
