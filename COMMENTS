@@ -1,0 +1,16 @@
+proto:
+  - Written in Python 3
+  - The answers are printed when the module is run
+    e.g. >$ python3 mps7.py
+  
+slcsp:
+  - Written in Python 3
+  - The completed slcsp.csv is saved as zip_x_rates.csv
+  - Running slcsp.py will regenrate zip_x_rates.csv
+
+middleware:
+  - First time using Go so don't be too harsh!
+  - The checksum for curling the localhost is 016858b824090bcd4e02c41e608416397200db10
+
+hhbuilder:
+  - A basic no frills js "class"
