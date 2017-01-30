@@ -6,9 +6,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"crypto/sha1"
 )
 
-const (
+const ( 
 	crlf       = "\r\n"
 	colonspace = ": "
 )
@@ -16,6 +17,9 @@ const (
 func ChecksumMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// your code goes here ...
+		hasher := sha1.New()
+		
+		hasher.Write("test")
 	})
 }
 
