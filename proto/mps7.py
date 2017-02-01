@@ -1,7 +1,3 @@
-"""
-Author: Berty Pribilovics
-
-"""
 import struct
 
 class MPS7():
@@ -53,10 +49,22 @@ class MPS7():
         return records
 
 
-    def get_record(self, _id):
-        for record in self.records:
-            if _id == record[2]:
-                return record
+    def get_records(self, _id):
+        return [
+            record for record in self.records
+            if _id == record[2]
+        ]
+
+
+    def sum_debits_credits(self, records):
+        """add credits and subtract debits"""
+        total = 0
+        for record in records:
+            if record[0] == 0:
+                total -= record[3]
+            elif record[0] == 1:
+                total += record[3]
+        return total
 
 
     def sum_record_types(self):
@@ -94,4 +102,4 @@ if __name__ == '__main__':
     print('How many autopays were ended?')
     print(totals[3])
     print('What is balance of user ID 2456938384156277127?')
-    print(mps7.get_record(2456938384156277127)[3])
+    print(mps7.sum_debits_credits(mps7.get_records(2456938384156277127)))
